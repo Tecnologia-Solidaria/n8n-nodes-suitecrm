@@ -1,0 +1,43 @@
+{
+  "name": "n8n-nodes-sinergiacrm",
+  "version": "1.0.0",
+  "description": "A generic n8n node to operate with any SinergiaCRM (SuiteCRM 7.x+) module via the official JSON API.",
+  "main": "dist/nodes/SinergiaCRM/SinergiaCRM.node.js",
+  "scripts": {
+    "build": "npx rimraf dist && tsc && cp nodes/SinergiaCRM/sinergiacrm.svg dist/nodes/SinergiaCRM/"
+  },
+  "keywords": [
+    "n8n",
+    "sinergiacrm",
+    "suitecrm",
+    "custom-node",
+    "n8n-community-node"
+  ],
+  "author": "Javier Quílez <javier.quilez@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tecnologia-Solidaria/n8n-nodes-sinergiacrm"
+  },
+  "bugs": {
+    "url": "https://github.com/Tecnologia-Solidaria/n8n-nodes-sinergiacrm/issues"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "nodes": [
+      "dist/nodes/SinergiaCRM/SinergiaCRM.node.js"
+    ]
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
+}

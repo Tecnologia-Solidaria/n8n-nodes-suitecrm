@@ -11,7 +11,14 @@
     "sinergiacrm",
     "suitecrm",
     "custom-node",
-    "n8n-community-node"
+    "n8n-community-node",
+    "n8n-community-nodes",
+    "n8n-custom-node",
+    "n8n-custom-nodes",
+    "n8n-node",
+    "n8n-nodes",
+    "n8n-node-package",
+    "n8n-community-node-package"
   ],
   "author": "Javier Quílez <javier.quilez@gmail.com>",
   "license": "MIT",
@@ -26,14 +33,15 @@
     "n8nNodesApiVersion": 1,
     "nodes": [
       "dist/nodes/SinergiaCRM/SinergiaCRM.node.js"
-      ],
-     "credentials": [
-       "dist/credentials/SinergiaCRMCredentials.credentials.js"
+    ],
+    "credentials": [
+      "dist/credentials/SinergiaCRMCredentials.credentials.js"
     ]
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "rimraf": "^5.0.0"
+    "@types/node": "^24.0.13",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0"
   },
   "peerDependencies": {
     "n8n-workflow": "*"

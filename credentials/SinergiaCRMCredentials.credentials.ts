@@ -1,10 +1,10 @@
-import { ICredentialType, INodeProperties } from 'n8n-workflow';
+import { ICredentialType, ICredentialTestRequest, INodeProperties } from 'n8n-workflow';
 
 /**
  * Credential definition for SinergiaCRM (SuiteCRM) API.
  * Uses OAuth2 Client Credentials flow (client_id, client_secret).
  * 
- * - API URL: Must be the base API endpoint, including "/Api" (e.g. https://example.com/Api)
+ * - Domain URL: Must be the base URL of your instance, excluding "/Api" (e.g. https://example.com)
  * - Client ID/Secret: Provided by the SuiteCRM instance (OAuth2 client).
  */
 export class SinergiaCRMCredentials implements ICredentialType {
@@ -13,12 +13,13 @@ export class SinergiaCRMCredentials implements ICredentialType {
 	documentationUrl = 'https://docs.suitecrm.com/developer/api/developer-setup-guide/json-api/';
 	properties: INodeProperties[] = [
 		{
-			displayName: 'API URL',
-			name: 'apiUrl',
+			displayName: 'Domain URL',
+			name: 'domainUrl',
 			type: 'string',
-			default: '',
-			placeholder: 'https://yourdomain.com/Api',
+			placeholder: 'https://yourdomain.com',
+			description: 'Base URL of your SinergiaCRM instance (do NOT include /Api)',
 			required: true,
+			default: '',
 		},
 		{
 			displayName: 'Client ID',
@@ -36,4 +37,13 @@ export class SinergiaCRMCredentials implements ICredentialType {
 			required: true,
 		},
 	];
+
+	test: ICredentialTestRequest = {
+		request: {
+			method: 'GET',
+			url: '={{$credentials.domainUrl}}',
+		},
+	};
+
+
 }

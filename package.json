@@ -26,6 +26,9 @@
     "n8nNodesApiVersion": 1,
     "nodes": [
       "dist/nodes/SinergiaCRM/SinergiaCRM.node.js"
+      ],
+     "credentials": [
+       "dist/credentials/SinergiaCRMCredentials.credentials.js"
     ]
   },
   "devDependencies": {

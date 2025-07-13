@@ -1,7 +1,7 @@
 
-# n8n-nodes-sinergiacrm
+# n8n-nodes-suitecrm
 
-A generic n8n node to operate with any SinergiaCRM (SuiteCRM 8.x+) module via the official JSON API.
+A generic n8n node to operate with any SuiteCRM (SuiteCRM 8.x+) module via the official JSON API.
 
 Supports CRUD operations, dynamic module and field discovery (including custom fields), advanced filtering, pagination, and relationship retrieval.
 
@@ -21,13 +21,13 @@ Supports CRUD operations, dynamic module and field discovery (including custom f
 ## Installation
 
 ```sh
-npm install n8n-nodes-sinergiacrm
+npm install n8n-nodes-suitecrm
 ```
 
 or
 
 ```sh
-pnpm add n8n-nodes-sinergiacrm
+pnpm add n8n-nodes-suitecrm
 ```
 
 Add to your n8n instance as a custom node following [n8n documentation on custom nodes](https://docs.n8n.io/integrations/creating-nodes/code/create-node/).
@@ -38,7 +38,7 @@ Add to your n8n instance as a custom node following [n8n documentation on custom
 
 ### 1. Credentials
 
-- Create credentials in n8n of type **SinergiaCRM API**.
+- Create credentials in n8n of type **SuiteCRM API**.
 - Enter your SuiteCRM API URL, Client ID, and Client Secret  
   (see SuiteCRM > Admin > OAuth2 Clients).
 
@@ -120,5 +120,5 @@ MIT
 
 **Maintainer:** Javier Quilez Cabello / tecnologiasolidaria.org
 **Support:** [SuiteCRM Community Forums](https://community.suitecrm.com/)
-**Source:** [GitHub](https://github.com/tecnologiasolidaria/n8n-nodes-sinergiacrm)
+**Source:** [GitHub](https://github.com/tecnologiasolidaria/n8n-nodes-suitecrm)
 **Docs:** [SuiteCRM JSON API Documentation](https://docs.suitecrm.com/developer/api/developer-setup-guide/json-api/)

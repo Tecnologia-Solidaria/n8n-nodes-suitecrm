@@ -6,7 +6,7 @@ import type {
 } from 'n8n-workflow';
 
 /**
- * Helper to perform authenticated HTTP requests against the SinergiaCRM API,
+ * Helper to perform authenticated HTTP requests against the SuiteCRM API,
  * using n8n credentials system.
  *
  * @param this - The n8n execution context (IExecuteFunctions)
@@ -18,7 +18,7 @@ import type {
  * @returns API response object (parsed JSON)
  * @throws Error with clear message in case of failure
  */
-export async function sinergiaCrmApiRequest(
+export async function suiteCrmApiRequest(
 	this: IExecuteFunctions,
 	method: IHttpRequestMethods,
 	endpoint: string,
@@ -39,13 +39,13 @@ export async function sinergiaCrmApiRequest(
 	try {
 		const response = await this.helpers.httpRequestWithAuthentication.call(
 			this,
-			'SinergiaCRMCredentials',
+			'SuiteCRMCredentials',
 			options,
 		);
 		return response;
 	} catch (error: any) {
 		throw new Error(
-			`[SinergiaCRM] Error in ${method} ${endpoint}: ${error.message}`,
+			`[SuiteCRM] Error in ${method} ${endpoint}: ${error.message}`,
 		);
 	}
 }

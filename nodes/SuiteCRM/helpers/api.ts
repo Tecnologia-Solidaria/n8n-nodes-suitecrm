@@ -3,7 +3,7 @@ import * as querystring from 'querystring';
 import { buildQueryParams } from './query';
 
 /**
- * Handles OAuth2 client_credentials authentication against SinergiaCRM (SuiteCRM API).
+ * Handles OAuth2 client_credentials authentication against SuiteCRM API.
  * Returns the sanitized apiUrl and the valid accessToken.
  * Throws if the access token cannot be obtained.
  */
@@ -33,7 +33,7 @@ export async function authenticate(
 	});
 
 	if (!tokenResponse.access_token) {
-		throw new Error('Could not obtain access_token from SinergiaCRM');
+		throw new Error('Could not obtain access_token from SuiteCRM');
 	}
 
 	return { apiUrl, accessToken: tokenResponse.access_token };

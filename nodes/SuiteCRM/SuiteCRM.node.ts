@@ -15,25 +15,25 @@ import { buildQueryParams } from './helpers/query';
 import { parseJsonInput } from './helpers/parse';
 
 /**
- * n8n node for generic access to any module of SinergiaCRM (SuiteCRM API).
+ * n8n node for generic access to any module of SuiteCRM (SuiteCRM API).
  * Handles CRUD operations and relationships for any given SuiteCRM module.
  */
-export class SinergiaCRM implements INodeType {
+export class SuiteCRM implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'SinergiaCRM',
-		name: 'sinergiaCrm',
-		icon: 'file:sinergiacrm.svg',
+		displayName: 'SuiteCRM',
+		name: 'suiteCrm',
+		icon: 'file:suitecrm.png',
 		group: ['transform'],
 		version: 1,
-		description: 'Generic node to operate with any SinergiaCRM (SuiteCRM API) module.',
+		description: 'Generic node to operate with any SuiteCRM (SuiteCRM API) module.',
 		defaults: {
-			name: 'SinergiaCRM',
+			name: 'SuiteCRM',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
-				name: 'SinergiaCRMCredentials',
+				name: 'SuiteCRMCredentials',
 				required: true,
 			},
 		],
@@ -44,7 +44,7 @@ export class SinergiaCRM implements INodeType {
 				type: 'options',
 				required: true,
 				default: '',
-				description: 'Select SinergiaCRM module',
+				description: 'Select SuiteCRM module',
 				typeOptions: {
 					loadOptionsMethod: 'getModules',
 				},
@@ -87,7 +87,7 @@ export class SinergiaCRM implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 
-		const credentials = await this.getCredentials('SinergiaCRMCredentials');
+		const credentials = await this.getCredentials('SuiteCRMCredentials');
 		const { apiUrl, accessToken } = await authenticate(this, credentials); // apiUrl includes /Api
 
 		const moduleName = this.getNodeParameter('module', 0) as string;

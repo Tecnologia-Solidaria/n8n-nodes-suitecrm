@@ -2,7 +2,7 @@ import type { ILoadOptionsFunctions } from 'n8n-workflow';
 import * as querystring from 'querystring';
 
 export async function getModules(this: ILoadOptionsFunctions) {
-	const credentials = await this.getCredentials('SinergiaCRMCredentials');
+	const credentials = await this.getCredentials('SuiteCRMCredentials');
 
 	const domainUrl = (credentials.domainUrl as string).replace(/\/$/, '');
 
@@ -28,7 +28,7 @@ export async function getModules(this: ILoadOptionsFunctions) {
 	});
 
 	if (!tokenResponse.access_token) {
-		throw new Error('Could not obtain SinergiaCRM access_token');
+		throw new Error('Could not obtain SuiteCRM access_token');
 	}
 
 	const modulesResponse = await this.helpers.httpRequest({
@@ -50,7 +50,7 @@ export async function getModules(this: ILoadOptionsFunctions) {
 }
 
 export async function getModuleFields(this: ILoadOptionsFunctions) {
-	const credentials = await this.getCredentials('SinergiaCRMCredentials');
+	const credentials = await this.getCredentials('SuiteCRMCredentials');
 
 	const domainUrl = (credentials.domainUrl as string).replace(/\/$/, '');
 
@@ -81,7 +81,7 @@ export async function getModuleFields(this: ILoadOptionsFunctions) {
 	});
 
 	if (!tokenResponse.access_token) {
-		throw new Error('Could not obtain SinergiaCRM access_token');
+		throw new Error('Could not obtain SuiteCRM access_token');
 	}
 
 	const fieldsResponse = await this.helpers.httpRequest({
@@ -108,7 +108,7 @@ export async function getModuleFields(this: ILoadOptionsFunctions) {
 }
 
 export async function getAvailableRelationships(this: ILoadOptionsFunctions) {
-	const credentials = await this.getCredentials('SinergiaCRMCredentials');
+	const credentials = await this.getCredentials('SuiteCRMCredentials');
 
 	const domainUrl = (credentials.domainUrl as string).replace(/\/$/, '');
 
@@ -141,7 +141,7 @@ export async function getAvailableRelationships(this: ILoadOptionsFunctions) {
 	});
 
 	if (!tokenResponse.access_token) {
-		throw new Error('Could not obtain SinergiaCRM access_token');
+		throw new Error('Could not obtain SuiteCRM access_token');
 	}
 
 	const recordResponse = await this.helpers.httpRequest({

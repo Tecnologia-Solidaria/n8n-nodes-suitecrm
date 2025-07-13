@@ -1,14 +1,14 @@
 {
-  "name": "n8n-nodes-sinergiacrm",
+  "name": "n8n-nodes-suitecrm",
   "version": "1.1.0",
-  "description": "A generic n8n node to operate with any SinergiaCRM (SuiteCRM 7.x+) module via the official JSON API.",
-  "main": "dist/nodes/SinergiaCRM/SinergiaCRM.node.js",
+  "description": "A generic n8n node to operate with any SuiteCRM (SuiteCRM 7.x+) module via the official JSON API.",
+  "main": "dist/nodes/SuiteCRM/SuiteCRM.node.js",
   "scripts": {
-    "build": "npx rimraf dist && tsc && cp nodes/SinergiaCRM/sinergiacrm.svg dist/nodes/SinergiaCRM/"
+    "build": "npx rimraf dist && tsc && cp nodes/SuiteCRM/suitecrm.png dist/nodes/SuiteCRM/"
   },
   "keywords": [
     "n8n",
-    "sinergiacrm",
+    "suitecrm",
     "suitecrm",
     "custom-node",
     "n8n-community-node",
@@ -24,18 +24,18 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Tecnologia-Solidaria/n8n-nodes-sinergiacrm"
+    "url": "https://github.com/Tecnologia-Solidaria/n8n-nodes-suitecrm"
   },
   "bugs": {
-    "url": "https://github.com/Tecnologia-Solidaria/n8n-nodes-sinergiacrm/issues"
+    "url": "https://github.com/Tecnologia-Solidaria/n8n-nodes-suitecrm/issues"
   },
   "n8n": {
     "n8nNodesApiVersion": 1,
     "nodes": [
-      "dist/nodes/SinergiaCRM/SinergiaCRM.node.js"
+      "dist/nodes/SuiteCRM/SuiteCRM.node.js"
     ],
     "credentials": [
-      "dist/credentials/SinergiaCRMCredentials.credentials.js"
+      "dist/credentials/SuiteCRMCredentials.credentials.js"
     ]
   },
   "devDependencies": {

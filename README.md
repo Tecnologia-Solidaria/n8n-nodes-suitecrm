@@ -21,13 +21,13 @@ Supports CRUD operations, dynamic module and field discovery (including custom f
 ## Installation
 
 ```sh
-npm install n8n-nodes-suitecrm
+npm install n8n-nodes-suitecrm-community
 ```
 
 or
 
 ```sh
-pnpm add n8n-nodes-suitecrm
+pnpm add n8n-nodes-suitecrm-community
 ```
 
 Add to your n8n instance as a custom node following [n8n documentation on custom nodes](https://docs.n8n.io/integrations/creating-nodes/code/create-node/).

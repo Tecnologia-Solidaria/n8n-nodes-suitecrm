@@ -42,6 +42,7 @@
     ]
   },
   "devDependencies": {
+    "@n8n/node-cli": "^0.43.4",
     "@types/node": "^24.0.13",
     "@typescript-eslint/eslint-plugin": "^8.67.0",
     "@typescript-eslint/parser": "^8.67.0",

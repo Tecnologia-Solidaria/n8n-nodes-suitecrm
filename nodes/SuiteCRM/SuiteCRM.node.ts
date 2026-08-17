@@ -7,6 +7,7 @@ import type {
 import { NodeConnectionType } from 'n8n-workflow';
 import type { IDataObject, NodeApiError } from 'n8n-workflow';
 import type { FilterOptions } from './helpers/filters';
+import { simplifyRecord } from './helpers/simplify';
 import type { SuiteCRMListResponse, SuiteCRMRecordResponse } from './helpers/types';
 
 import * as methods from './methods.loadOptions';
@@ -87,6 +88,13 @@ export class SuiteCRM implements INodeType {
 					},
 				},
 			},
+			{
+				displayName: 'Simplify',
+				name: 'simplify',
+				type: 'boolean',
+				default: true,
+				description: 'Whether to return a simplified version of the response instead of the raw data',
+			},
 		],
 	};
 
@@ -100,6 +108,7 @@ export class SuiteCRM implements INodeType {
 
 		const moduleName = this.getNodeParameter('module', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
+		const simplify = this.getNodeParameter('simplify', 0, true) as boolean;
 
 		// Normalize credentials base URL (ensure no trailing slash)
 		const credentials = await this.getCredentials('SuiteCRMCredentials');
@@ -156,7 +165,7 @@ export class SuiteCRM implements INodeType {
 
 					const sliced = returnAll ? collected : collected.slice(0, limit);
 					for (const record of sliced) {
-						returnData.push({ json: record });
+						returnData.push({ json: simplify ? simplifyRecord(record) : record });
 					}
 
 				// GET ONE record by ID
@@ -167,7 +176,8 @@ export class SuiteCRM implements INodeType {
 						url: `${url}/${moduleName}/${id}`,
 						json: true,
 					})) as SuiteCRMRecordResponse;
-					returnData.push({ json: response.data ?? {} });
+					const data = response.data ?? {};
+					returnData.push({ json: simplify ? simplifyRecord(data) : data });
 
 				// CREATE record
 				} else if (operation === 'create') {
@@ -197,7 +207,7 @@ export class SuiteCRM implements INodeType {
 						url: `${url}/${moduleName}/${id}`,
 						json: true,
 					});
-					returnData.push({ json: { success: true, id } });
+					returnData.push({ json: { deleted: true, id } });
 
 				// GET RELATIONSHIPS of a record
 				} else if (operation === 'getRelationships') {
@@ -208,7 +218,8 @@ export class SuiteCRM implements INodeType {
 						url: `${url}/${moduleName}/${id}/relationships/${relationship}`,
 						json: true,
 					})) as SuiteCRMRecordResponse;
-					returnData.push({ json: response.data ?? {} });
+					const data = response.data ?? {};
+					returnData.push({ json: simplify ? simplifyRecord(data) : data });
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {

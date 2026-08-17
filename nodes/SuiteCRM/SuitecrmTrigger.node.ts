@@ -13,7 +13,7 @@ export class SuiteCRMTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SuiteCRM Trigger',
 		name: 'suitecrmTrigger',
-		icon: { light: 'file:suitecrm.svg', dark: 'file:suitecrm.svg' },
+		icon: 'file:suitecrm.svg',
 		subtitle: '={{ $json.module }} - {{ $json.event }}',
 		group: ['trigger'],
 		version: 1,

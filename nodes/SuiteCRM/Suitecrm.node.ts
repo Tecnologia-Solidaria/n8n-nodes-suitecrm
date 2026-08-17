@@ -33,7 +33,7 @@ export class SuiteCRM implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SuiteCRM',
 		name: 'suitecrm',
-		icon: { light: 'file:suitecrm.svg', dark: 'file:suitecrm.svg' },
+		icon: 'file:suitecrm.svg',
 		subtitle: '={{ $json.operation }}: {{ $json.module }}',
 		group: ['transform'],
 		version: 1,

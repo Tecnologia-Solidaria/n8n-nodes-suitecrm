@@ -1,6 +1,6 @@
 // test/SuiteCRMTrigger.node.test.ts
 import { describe, expect, it } from 'vitest';
-import { SuiteCRMTrigger } from '../nodes/SuiteCRM/SuiteCRMTrigger.node';
+import { SuiteCRMTrigger } from '../nodes/SuiteCRM/SuitecrmTrigger.node';
 
 describe('SuiteCRMTrigger', () => {
 	it('expone un nodo de polling con la descripción correcta', () => {
@@ -14,12 +14,12 @@ describe('SuiteCRMTrigger', () => {
 		expect(node.description.polling).toBe(true);
 	});
 
-	it('define la credencial SuiteCRMCredentials como obligatoria', () => {
+	it('define la credencial suitecrmOAuth2Api como obligatoria', () => {
 		const node = new SuiteCRMTrigger();
 
 		expect(node.description.credentials).toEqual([
 			{
-				name: 'SuiteCRMCredentials',
+				name: 'suitecrmOAuth2Api',
 				required: true,
 			},
 		]);

@@ -25,6 +25,7 @@ function createContext(overrides: ContextOverrides = {}) {
 		getCurrentNodeParameter: vi.fn().mockImplementation((name: string) => params[name]),
 		helpers: {
 			requestWithAuthentication,
+			httpRequestWithAuthentication: requestWithAuthentication,
 		},
 	} as unknown as ILoadOptionsFunctions;
 
@@ -51,7 +52,7 @@ describe('getModules', () => {
 			{ name: 'Contacts', value: 'Contacts' },
 		]);
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'GET',
 				url: 'https://crm.example.com/Api/V8/meta/modules',

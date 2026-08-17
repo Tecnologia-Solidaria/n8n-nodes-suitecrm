@@ -18,13 +18,13 @@ interface RelationshipsResponse {
  * Uses OAuth2 client_credentials handled by n8n.
  */
 export async function getModules(this: ILoadOptionsFunctions) {
-	const credentials = await this.getCredentials('SuiteCRMCredentials');
+	const credentials = await this.getCredentials('suitecrmOAuth2Api');
 	const domainUrl = (credentials.domainUrl as string).replace(/\/$/, '');
 	const url = `${domainUrl}/Api/V8/meta/modules`;
 
-	const response = (await this.helpers.requestWithAuthentication.call(
+	const response = (await this.helpers.httpRequestWithAuthentication.call(
 		this,
-		'SuiteCRMCredentials',
+		'suitecrmOAuth2Api',
 		{
 			method: 'GET',
 			url,
@@ -44,7 +44,7 @@ export async function getModules(this: ILoadOptionsFunctions) {
  * Supports both standard and custom fields.
  */
 export async function getModuleFields(this: ILoadOptionsFunctions) {
-	const credentials = await this.getCredentials('SuiteCRMCredentials');
+	const credentials = await this.getCredentials('suitecrmOAuth2Api');
 	const domainUrl = (credentials.domainUrl as string).replace(/\/$/, '');
 	const module = this.getCurrentNodeParameter('module') as string;
 
@@ -52,9 +52,9 @@ export async function getModuleFields(this: ILoadOptionsFunctions) {
 
 	const url = `${domainUrl}/Api/V8/meta/fields/${module}`;
 
-	const response = (await this.helpers.requestWithAuthentication.call(
+	const response = (await this.helpers.httpRequestWithAuthentication.call(
 		this,
-		'SuiteCRMCredentials',
+		'suitecrmOAuth2Api',
 		{
 			method: 'GET',
 			url,
@@ -81,7 +81,7 @@ export async function getModuleFields(this: ILoadOptionsFunctions) {
  * Load available relationships for a given record in a module.
  */
 export async function getAvailableRelationships(this: ILoadOptionsFunctions) {
-	const credentials = await this.getCredentials('SuiteCRMCredentials');
+	const credentials = await this.getCredentials('suitecrmOAuth2Api');
 	const domainUrl = (credentials.domainUrl as string).replace(/\/$/, '');
 	const module = this.getCurrentNodeParameter('module') as string;
 	const recordId = (this.getCurrentNodeParameter('recordId') ?? this.getCurrentNodeParameter('id')) as string;
@@ -90,9 +90,9 @@ export async function getAvailableRelationships(this: ILoadOptionsFunctions) {
 
 	const url = `${domainUrl}/Api/V8/module/${module}/${recordId}`;
 
-	const response = (await this.helpers.requestWithAuthentication.call(
+	const response = (await this.helpers.httpRequestWithAuthentication.call(
 		this,
-		'SuiteCRMCredentials',
+		'suitecrmOAuth2Api',
 		{
 			method: 'GET',
 			url,

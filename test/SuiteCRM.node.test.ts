@@ -2,7 +2,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { NodeOperationError } from 'n8n-workflow';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
-import { SuiteCRM } from '../nodes/SuiteCRM/SuiteCRM.node';
+import { SuiteCRM } from '../nodes/SuiteCRM/Suitecrm.node';
 
 interface NodeContextOverrides {
 	items?: INodeExecutionData[];
@@ -41,6 +41,7 @@ function createExecuteContext(overrides: NodeContextOverrides = {}) {
 		continueOnFail: vi.fn().mockReturnValue(overrides.continueOnFail ?? false),
 		helpers: {
 			requestWithAuthentication,
+			httpRequestWithAuthentication: requestWithAuthentication,
 		},
 	} as unknown as IExecuteFunctions;
 
@@ -62,7 +63,7 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: { id: '1' } }, { json: { id: '2' } }]);
+		expect(result).toEqual([{ json: { id: '1' }, pairedItem: { item: 0 } }, { json: { id: '2' }, pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenCalledTimes(1);
 		expect(requestWithAuthentication.mock.calls[0][1]).toEqual(
 			expect.objectContaining({
@@ -89,9 +90,9 @@ describe('SuiteCRM.execute', () => {
 		const [result] = await node.execute.call(context);
 
 		expect(result).toEqual([
-			{ json: { id: '1' } },
-			{ json: { id: '2' } },
-			{ json: { id: '3' } },
+			{ json: { id: '1' }, pairedItem: { item: 0 } },
+			{ json: { id: '2' }, pairedItem: { item: 0 } },
+			{ json: { id: '3' }, pairedItem: { item: 0 } },
 		]);
 		expect(requestWithAuthentication).toHaveBeenCalledTimes(2);
 		expect(requestWithAuthentication.mock.calls[0][1]).toEqual(
@@ -133,9 +134,9 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: { id: 'acc-1', name: 'ACME' } }]);
+		expect(result).toEqual([{ json: { id: 'acc-1', name: 'ACME' }, pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'GET',
 				url: 'https://crm.example.com/Api/V8/module/Accounts/acc-1',
@@ -156,9 +157,9 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: { id: 'c-1', type: 'Contacts' } }]);
+		expect(result).toEqual([{ json: { id: 'c-1', type: 'Contacts' }, pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'POST',
 				url: 'https://crm.example.com/Api/V8/module',
@@ -186,9 +187,9 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: { id: 'c-1' } }]);
+		expect(result).toEqual([{ json: { id: 'c-1' }, pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'PATCH',
 				url: 'https://crm.example.com/Api/V8/module',
@@ -212,9 +213,9 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: { deleted: true, id: 'acc-9' } }]);
+		expect(result).toEqual([{ json: { deleted: true, id: 'acc-9' }, pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'DELETE',
 				url: 'https://crm.example.com/Api/V8/module/Accounts/acc-9',
@@ -236,9 +237,9 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: [{ id: 'c-1' }] }]);
+		expect(result).toEqual([{ json: [{ id: 'c-1' }], pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'GET',
 				url: 'https://crm.example.com/Api/V8/module/Accounts/acc-1/relationships/contacts',
@@ -265,6 +266,7 @@ describe('SuiteCRM.execute', () => {
 		expect(result).toHaveLength(1);
 		expect(result[0].json).toEqual({ error: 'boom' });
 		expect(result[0].error).toBeInstanceOf(Error);
+		expect(result[0].pairedItem).toEqual({ item: 0 });
 	});
 
 	it('rethrows the error when continueOnFail is disabled', async () => {
@@ -320,9 +322,9 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: { id: 'c-1' } }]);
+		expect(result).toEqual([{ json: { id: 'c-1' }, pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'POST',
 				url: 'https://crm.example.com/Api/V8/module',
@@ -353,7 +355,7 @@ describe('SuiteCRM.execute', () => {
 		await node.execute.call(context);
 
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				body: {
 					data: {
@@ -380,7 +382,7 @@ describe('SuiteCRM.execute', () => {
 		await node.execute.call(context);
 
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'PATCH',
 				url: 'https://crm.example.com/Api/V8/module',
@@ -410,7 +412,7 @@ describe('SuiteCRM.execute', () => {
 		await node.execute.call(context);
 
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				body: {
 					data: {
@@ -479,10 +481,10 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: { id: 'c-1', type: 'Contacts' } }]);
+		expect(result).toEqual([{ json: { id: 'c-1', type: 'Contacts' }, pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenNthCalledWith(
 			1,
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'GET',
 				url: 'https://crm.example.com/Api/V8/module/Accounts/acc-1/relationships/contacts',
@@ -491,7 +493,7 @@ describe('SuiteCRM.execute', () => {
 		);
 		expect(requestWithAuthentication).toHaveBeenNthCalledWith(
 			2,
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'POST',
 				url: 'https://crm.example.com/Api/V8/module/Accounts/acc-1/relationships/contacts',
@@ -537,7 +539,7 @@ describe('SuiteCRM.execute', () => {
 		const [result] = await node.execute.call(context);
 
 		expect(result).toEqual([
-			{ json: { success: true, alreadyLinked: true, id: 'c-1', type: 'Contacts' } },
+			{ json: { success: true, alreadyLinked: true, id: 'c-1', type: 'Contacts' }, pairedItem: { item: 0 } },
 		]);
 		expect(requestWithAuthentication).toHaveBeenCalledTimes(1);
 	});
@@ -572,9 +574,9 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: { success: true, id: 'c-1' } }]);
+		expect(result).toEqual([{ json: { success: true, id: 'c-1' }, pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenCalledWith(
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			expect.objectContaining({
 				method: 'DELETE',
 				url: 'https://crm.example.com/Api/V8/module/Accounts/acc-1/relationships/contacts/c-1',
@@ -597,7 +599,7 @@ describe('SuiteCRM.execute', () => {
 
 		const [result] = await node.execute.call(context);
 
-		expect(result).toEqual([{ json: { success: true, alreadyUnlinked: true, id: 'c-1' } }]);
+		expect(result).toEqual([{ json: { success: true, alreadyUnlinked: true, id: 'c-1' }, pairedItem: { item: 0 } }]);
 		expect(requestWithAuthentication).toHaveBeenCalledTimes(1);
 	});
 

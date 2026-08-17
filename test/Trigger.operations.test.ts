@@ -36,6 +36,7 @@ function createPollContext(overrides: TriggerContextOverrides = {}) {
 		getMode: vi.fn().mockReturnValue(overrides.mode ?? 'trigger'),
 		helpers: {
 			requestWithAuthentication,
+			httpRequestWithAuthentication: requestWithAuthentication,
 		},
 	} as unknown as IPollFunctions;
 

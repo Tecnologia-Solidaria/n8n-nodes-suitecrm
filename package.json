@@ -1,12 +1,12 @@
 {
   "name": "n8n-nodes-suitecrm-community",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "A generic n8n node to operate with any SuiteCRM (7.x+) module via the official JSON API.",
-  "main": "dist/nodes/SuiteCRM/SuiteCRM.node.js",
-  "types": "dist/nodes/SuiteCRM/SuiteCRM.node.d.ts",
+  "main": "dist/nodes/SuiteCRM/Suitecrm.node.js",
+  "types": "dist/nodes/SuiteCRM/Suitecrm.node.d.ts",
   "scripts": {
-    "build": "rimraf dist && tsc && cp nodes/SuiteCRM/suitecrm.png dist/nodes/SuiteCRM/",
-    "lint": "eslint . --resolve-plugins-relative-to .",
+    "build": "rimraf dist && tsc && cp nodes/SuiteCRM/suitecrm.svg dist/nodes/SuiteCRM/",
+    "lint": "eslint . --ext .ts --resolve-plugins-relative-to .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -21,8 +21,7 @@
     "n8n-community-node",
     "n8n-community-node-package"
   ],
-  "author": "Javier Quílez <javier.quilez@gmail.com>",
-  "organization": "Tecnología Solidaria",
+  "author": "Javier Quílez <javier.quilez@gmail.com> [Tecnología Solidaria]",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -34,11 +33,11 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "nodes": [
-      "dist/nodes/SuiteCRM/SuiteCRM.node.js",
-      "dist/nodes/SuiteCRM/SuiteCRMTrigger.node.js"
+      "dist/nodes/SuiteCRM/Suitecrm.node.js",
+      "dist/nodes/SuiteCRM/SuitecrmTrigger.node.js"
     ],
     "credentials": [
-      "dist/credentials/SuiteCRMCredentials.credentials.js"
+      "dist/credentials/SuiteCRMOAuth2Api.credentials.js"
     ]
   },
   "devDependencies": {

@@ -13,7 +13,8 @@ export class SuiteCRMTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SuiteCRM Trigger',
 		name: 'suitecrmTrigger',
-		icon: 'file:suitecrm.png',
+		icon: 'file:suitecrm.svg',
+		subtitle: '={{ $json.module }} - {{ $json.event }}',
 		group: ['trigger'],
 		version: 1,
 		description: 'Polls SuiteCRM (SuiteCRM API) for new or updated records.',
@@ -25,7 +26,7 @@ export class SuiteCRMTrigger implements INodeType {
 		polling: true,
 		credentials: [
 			{
-				name: 'SuiteCRMCredentials',
+				name: 'suitecrmOAuth2Api',
 				required: true,
 			},
 		],

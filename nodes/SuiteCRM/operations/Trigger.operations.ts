@@ -196,9 +196,9 @@ interface WindowResult {
 }
 
 async function seedCursor(this: IPollFunctions, url: string, moduleName: string): Promise<string> {
-	const response = (await this.helpers.requestWithAuthentication.call(
+	const response = (await this.helpers.httpRequestWithAuthentication.call(
 		this,
-		'SuiteCRMCredentials',
+		'suitecrmOAuth2Api',
 		{
 			method: 'GET',
 			url: `${url}/${moduleName}`,
@@ -230,9 +230,9 @@ async function fetchWindow(
 	const collected: IDataObject[] = [];
 
 	for (let page = 1; page <= TRIGGER_MAX_PAGES; page++) {
-		const response = (await this.helpers.requestWithAuthentication.call(
+		const response = (await this.helpers.httpRequestWithAuthentication.call(
 			this,
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			{
 				method: 'GET',
 				url: `${url}/${moduleName}`,
@@ -278,6 +278,7 @@ function buildOutputItem(
 			date_modified: dateModified,
 			...attributes,
 		},
+		pairedItem: { item: 0 },
 	};
 }
 
@@ -296,16 +297,16 @@ async function pollSample(
 		return null;
 	}
 
-	const credentials = await this.getCredentials('SuiteCRMCredentials');
+	const credentials = await this.getCredentials('suitecrmOAuth2Api');
 	const baseUrl = (credentials.domainUrl as string).replace(/\/$/, '');
 	const url = `${baseUrl}/Api/V8/module`;
 
 	const sample: INodeExecutionData[] = [];
 
 	for (const moduleName of modules) {
-		const response = (await this.helpers.requestWithAuthentication.call(
+		const response = (await this.helpers.httpRequestWithAuthentication.call(
 			this,
-			'SuiteCRMCredentials',
+			'suitecrmOAuth2Api',
 			{
 				method: 'GET',
 				url: `${url}/${moduleName}`,
@@ -370,7 +371,7 @@ export async function poll(this: IPollFunctions): Promise<INodeExecutionData[][]
 		return null;
 	}
 
-	const credentials = await this.getCredentials('SuiteCRMCredentials');
+	const credentials = await this.getCredentials('suitecrmOAuth2Api');
 	const baseUrl = (credentials.domainUrl as string).replace(/\/$/, '');
 	const url = `${baseUrl}/Api/V8/module`;
 

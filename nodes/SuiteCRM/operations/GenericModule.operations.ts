@@ -400,7 +400,7 @@ export async function createRecord(
 ): Promise<IDataObject> {
 	const attributes = resolveRecordAttributes.call(this, itemIndex);
 	const body = buildCreateBody(moduleName, attributes);
-	const response = (await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+	const response = (await this.helpers.httpRequestWithAuthentication.call(this, 'suitecrmOAuth2Api', {
 		method: 'POST',
 		url: baseUrl,
 		body: body as unknown as IDataObject,
@@ -421,7 +421,7 @@ export async function updateRecord(
 	const id = this.getNodeParameter('id', itemIndex) as string;
 	const attributes = resolveRecordAttributes.call(this, itemIndex);
 	const body = buildUpdateBody(moduleName, id, attributes);
-	const response = (await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+	const response = (await this.helpers.httpRequestWithAuthentication.call(this, 'suitecrmOAuth2Api', {
 		method: 'PATCH',
 		url: baseUrl,
 		body: body as unknown as IDataObject,
@@ -471,7 +471,7 @@ export async function linkRecord(
 	const relationshipsUrl = `${baseUrl}/${moduleName}/${recordId}/relationships/${relationship}`;
 
 	// Skip the link when it already exists (FR-006: idempotent behavior)
-	const existing = (await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+	const existing = (await this.helpers.httpRequestWithAuthentication.call(this, 'suitecrmOAuth2Api', {
 		method: 'GET',
 		url: relationshipsUrl,
 		json: true,
@@ -482,7 +482,7 @@ export async function linkRecord(
 
 	try {
 		const body = buildLinkBody(relatedModule, relatedId);
-		const response = (await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+		const response = (await this.helpers.httpRequestWithAuthentication.call(this, 'suitecrmOAuth2Api', {
 			method: 'POST',
 			url: relationshipsUrl,
 			body: body as unknown as IDataObject,
@@ -515,7 +515,7 @@ export async function unlinkRecord(
 	const relatedId = this.getNodeParameter('relatedId', itemIndex) as string;
 
 	try {
-		await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+		await this.helpers.httpRequestWithAuthentication.call(this, 'suitecrmOAuth2Api', {
 			method: 'DELETE',
 			url: `${baseUrl}/${moduleName}/${recordId}/relationships/${relationship}/${relatedId}`,
 			json: true,

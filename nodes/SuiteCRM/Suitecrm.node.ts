@@ -33,7 +33,8 @@ export class SuiteCRM implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SuiteCRM',
 		name: 'suitecrm',
-		icon: 'file:suitecrm.png',
+		icon: 'file:suitecrm.svg',
+		subtitle: '={{ $json.operation }}: {{ $json.module }}',
 		group: ['transform'],
 		version: 1,
 		description: 'Create, update, read, link or unlink records in SuiteCRM.',
@@ -45,7 +46,7 @@ export class SuiteCRM implements INodeType {
 		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
-				name: 'SuiteCRMCredentials',
+				name: 'suitecrmOAuth2Api',
 				required: true,
 			},
 		],
@@ -111,7 +112,7 @@ export class SuiteCRM implements INodeType {
 		const simplify = this.getNodeParameter('simplify', 0, true) as boolean;
 
 		// Normalize credentials base URL (ensure no trailing slash)
-		const credentials = await this.getCredentials('SuiteCRMCredentials');
+		const credentials = await this.getCredentials('suitecrmOAuth2Api');
 		const baseUrl = (credentials.domainUrl as string).replace(/\/$/, '');
 		const url = `${baseUrl}/Api/V8/module`;
 
@@ -135,9 +136,9 @@ export class SuiteCRM implements INodeType {
 							filters: options?.filters,
 						});
 
-						const data = (await this.helpers.requestWithAuthentication.call(
+						const data = (await this.helpers.httpRequestWithAuthentication.call(
 							this,
-							'SuiteCRMCredentials',
+							'suitecrmOAuth2Api',
 							{
 								method: 'GET',
 								url: `${url}/${moduleName}`,
@@ -163,69 +164,70 @@ export class SuiteCRM implements INodeType {
 						pageNumber++;
 					} while (true);
 
-					const sliced = returnAll ? collected : collected.slice(0, limit);
-					for (const record of sliced) {
-						returnData.push({ json: simplify ? simplifyRecord(record) : record });
-					}
+				const sliced = returnAll ? collected : collected.slice(0, limit);
+				for (const record of sliced) {
+					returnData.push({ json: simplify ? simplifyRecord(record) : record, pairedItem: { item: i } });
+				}
 
 				// GET ONE record by ID
 				} else if (operation === 'getOne') {
 					const id = this.getNodeParameter('id', i) as string;
-					const response = (await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+					const response = (await this.helpers.httpRequestWithAuthentication.call(this, 'suitecrmOAuth2Api', {
 						method: 'GET',
 						url: `${url}/${moduleName}/${id}`,
 						json: true,
 					})) as SuiteCRMRecordResponse;
 					const data = response.data ?? {};
-					returnData.push({ json: simplify ? simplifyRecord(data) : data });
+					returnData.push({ json: simplify ? simplifyRecord(data) : data, pairedItem: { item: i } });
 
 				// CREATE record
 				} else if (operation === 'create') {
 					const responseData = await createRecord.call(this, moduleName, url, i);
-					returnData.push({ json: responseData });
+					returnData.push({ json: responseData, pairedItem: { item: i } });
 
 				// UPDATE record
 				} else if (operation === 'update') {
 					const responseData = await updateRecord.call(this, moduleName, url, i);
-					returnData.push({ json: responseData });
+					returnData.push({ json: responseData, pairedItem: { item: i } });
 
 				// LINK an existing record to another
 				} else if (operation === 'linkRecord') {
 					const responseData = await linkRecord.call(this, moduleName, url, i);
-					returnData.push({ json: responseData });
+					returnData.push({ json: responseData, pairedItem: { item: i } });
 
 				// UNLINK a record
 				} else if (operation === 'unlinkRecord') {
 					const responseData = await unlinkRecord.call(this, moduleName, url, i);
-					returnData.push({ json: responseData });
+					returnData.push({ json: responseData, pairedItem: { item: i } });
 
 				// DELETE record
 				} else if (operation === 'delete') {
 					const id = this.getNodeParameter('id', i) as string;
-					await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+					await this.helpers.httpRequestWithAuthentication.call(this, 'suitecrmOAuth2Api', {
 						method: 'DELETE',
 						url: `${url}/${moduleName}/${id}`,
 						json: true,
 					});
-					returnData.push({ json: { deleted: true, id } });
+					returnData.push({ json: { deleted: true, id }, pairedItem: { item: i } });
 
 				// GET RELATIONSHIPS of a record
 				} else if (operation === 'getRelationships') {
 					const id = this.getNodeParameter('id', i) as string;
 					const relationship = this.getNodeParameter('relationship', i) as string;
-					const response = (await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+					const response = (await this.helpers.httpRequestWithAuthentication.call(this, 'suitecrmOAuth2Api', {
 						method: 'GET',
 						url: `${url}/${moduleName}/${id}/relationships/${relationship}`,
 						json: true,
 					})) as SuiteCRMRecordResponse;
 					const data = response.data ?? {};
-					returnData.push({ json: simplify ? simplifyRecord(data) : data });
+					returnData.push({ json: simplify ? simplifyRecord(data) : data, pairedItem: { item: i } });
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {
 					const message = error instanceof Error ? error.message : String(error);
 					returnData.push({
 						json: { error: message },
+						pairedItem: { item: i },
 						error: error as NodeApiError,
 					});
 					continue;

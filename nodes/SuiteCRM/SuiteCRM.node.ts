@@ -1,31 +1,42 @@
-import {
+import type {
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	NodeConnectionType,
 } from 'n8n-workflow';
+import { NodeConnectionType } from 'n8n-workflow';
+import type { IDataObject, NodeApiError } from 'n8n-workflow';
+import type { FilterOptions } from './helpers/filters';
+import type { SuiteCRMListResponse, SuiteCRMRecordResponse } from './helpers/types';
 
 import * as methods from './methods.loadOptions';
-import { genericModuleOperations } from './operations/GenericModule.operations';
+import {
+	createRecord,
+	genericModuleOperations,
+	linkRecord,
+	unlinkRecord,
+	updateRecord,
+} from './operations/GenericModule.operations';
+import { buildListQuery, resolvePageSize, shouldFetchNextPage } from './helpers/query';
 
-// Central helpers
-import { authenticate, fetchModuleRecords } from './helpers/api';
-import { buildQueryParams } from './helpers/query';
-import { parseJsonInput } from './helpers/parse';
+interface GetAllOptions {
+	pageSize?: number;
+	filters?: FilterOptions;
+}
 
 /**
- * n8n node for generic access to any module of SuiteCRM (SuiteCRM API).
- * Handles CRUD operations and relationships for any given SuiteCRM module.
+ * n8n node for interacting with any module of SuiteCRM (SuiteCRM API).
+ * Supports CRUD operations, relationship fetching, pagination and filters.
  */
 export class SuiteCRM implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SuiteCRM',
-		name: 'suiteCrm',
+		name: 'suitecrm',
 		icon: 'file:suitecrm.png',
 		group: ['transform'],
 		version: 1,
-		description: 'Generic node to operate with any SuiteCRM (SuiteCRM API) module.',
+		description: 'Create, update, read, link or unlink records in SuiteCRM.',
+		usableAsTool: true,
 		defaults: {
 			name: 'SuiteCRM',
 		},
@@ -44,7 +55,7 @@ export class SuiteCRM implements INodeType {
 				type: 'options',
 				required: true,
 				default: '',
-				description: 'Select SuiteCRM module',
+				description: 'Select a module from SuiteCRM',
 				typeOptions: {
 					loadOptionsMethod: 'getModules',
 				},
@@ -56,7 +67,7 @@ export class SuiteCRM implements INodeType {
 				name: 'returnAll',
 				type: 'boolean',
 				default: false,
-				description: 'Fetch all records using auto-pagination.',
+				description: 'Fetch all records using auto-pagination',
 				displayOptions: {
 					show: {
 						operation: ['getAll'],
@@ -67,8 +78,8 @@ export class SuiteCRM implements INodeType {
 				displayName: 'Limit',
 				name: 'limit',
 				type: 'number',
-				default: 100,
-				description: 'Max records to return (if Return All is inactive).',
+				default: '={{ $fromAI("limit", "Maximum number of records to return", "number", 100) }}',
+				description: 'Maximum number of records to return when Return All is disabled',
 				displayOptions: {
 					show: {
 						operation: ['getAll'],
@@ -87,97 +98,129 @@ export class SuiteCRM implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 
-		const credentials = await this.getCredentials('SuiteCRMCredentials');
-		const { apiUrl, accessToken } = await authenticate(this, credentials); // apiUrl includes /Api
-
 		const moduleName = this.getNodeParameter('module', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
 
-		if (operation === 'getAll') {
-			const returnAll = this.getNodeParameter('returnAll', 0, false) as boolean;
-			const limit = this.getNodeParameter('limit', 0, 100) as number;
-			const options = this.getNodeParameter('options', 0, {}) as any;
+		// Normalize credentials base URL (ensure no trailing slash)
+		const credentials = await this.getCredentials('SuiteCRMCredentials');
+		const baseUrl = (credentials.domainUrl as string).replace(/\/$/, '');
+		const url = `${baseUrl}/Api/V8/module`;
 
-			const records = await fetchModuleRecords(
-				this,
-				apiUrl,
-				accessToken,
-				moduleName,
-				options,
-				returnAll,
-				limit,
-			);
+		for (let i = 0; i < items.length; i++) {
+			try {
+				// GET ALL records
+				if (operation === 'getAll') {
+					const returnAll = this.getNodeParameter('returnAll', i, false) as boolean;
+					const limit = this.getNodeParameter('limit', i, 100) as number;
+					const options = this.getNodeParameter('options', i, {}) as GetAllOptions;
 
-			for (const record of records) {
-				returnData.push({ json: record });
+					let collected: IDataObject[] = [];
+					let pageNumber = 1;
+
+					const pageSize = resolvePageSize(returnAll, limit, options);
+
+					do {
+						const qs = buildListQuery({
+							pageSize,
+							pageNumber,
+							filters: options?.filters,
+						});
+
+						const data = (await this.helpers.requestWithAuthentication.call(
+							this,
+							'SuiteCRMCredentials',
+							{
+								method: 'GET',
+								url: `${url}/${moduleName}`,
+								qs,
+								json: true,
+							},
+						)) as SuiteCRMListResponse;
+
+						const records = data.data || [];
+						collected.push(...records);
+
+						if (
+							!shouldFetchNextPage({
+								returnAll,
+								recordsLength: records.length,
+								pageSize,
+								limit,
+								collectedLength: collected.length,
+							})
+						) {
+							break;
+						}
+						pageNumber++;
+					} while (true);
+
+					const sliced = returnAll ? collected : collected.slice(0, limit);
+					for (const record of sliced) {
+						returnData.push({ json: record });
+					}
+
+				// GET ONE record by ID
+				} else if (operation === 'getOne') {
+					const id = this.getNodeParameter('id', i) as string;
+					const response = (await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+						method: 'GET',
+						url: `${url}/${moduleName}/${id}`,
+						json: true,
+					})) as SuiteCRMRecordResponse;
+					returnData.push({ json: response.data ?? {} });
+
+				// CREATE record
+				} else if (operation === 'create') {
+					const responseData = await createRecord.call(this, moduleName, url, i);
+					returnData.push({ json: responseData });
+
+				// UPDATE record
+				} else if (operation === 'update') {
+					const responseData = await updateRecord.call(this, moduleName, url, i);
+					returnData.push({ json: responseData });
+
+				// LINK an existing record to another
+				} else if (operation === 'linkRecord') {
+					const responseData = await linkRecord.call(this, moduleName, url, i);
+					returnData.push({ json: responseData });
+
+				// UNLINK a record
+				} else if (operation === 'unlinkRecord') {
+					const responseData = await unlinkRecord.call(this, moduleName, url, i);
+					returnData.push({ json: responseData });
+
+				// DELETE record
+				} else if (operation === 'delete') {
+					const id = this.getNodeParameter('id', i) as string;
+					await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+						method: 'DELETE',
+						url: `${url}/${moduleName}/${id}`,
+						json: true,
+					});
+					returnData.push({ json: { success: true, id } });
+
+				// GET RELATIONSHIPS of a record
+				} else if (operation === 'getRelationships') {
+					const id = this.getNodeParameter('id', i) as string;
+					const relationship = this.getNodeParameter('relationship', i) as string;
+					const response = (await this.helpers.requestWithAuthentication.call(this, 'SuiteCRMCredentials', {
+						method: 'GET',
+						url: `${url}/${moduleName}/${id}/relationships/${relationship}`,
+						json: true,
+					})) as SuiteCRMRecordResponse;
+					returnData.push({ json: response.data ?? {} });
+				}
+			} catch (error) {
+				if (this.continueOnFail()) {
+					const message = error instanceof Error ? error.message : String(error);
+					returnData.push({
+						json: { error: message },
+						error: error as NodeApiError,
+					});
+					continue;
+				}
+				throw error;
 			}
-		} else if (operation === 'getOne') {
-			const recordId = this.getNodeParameter('id', 0) as string;
-			const response = await this.helpers.httpRequest({
-				method: 'GET',
-				url: `${apiUrl}/V8/module/${moduleName}/${recordId}`,
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
-				json: true,
-			});
-			returnData.push({ json: response.data ?? response });
-		} else if (operation === 'create') {
-			const attributes = parseJsonInput(this.getNodeParameter('data', 0));
-			const payload = {
-				data: { type: moduleName, attributes },
-			};
-			const response = await this.helpers.httpRequest({
-				method: 'POST',
-				url: `${apiUrl}/V8/module`,
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-					'Content-Type': 'application/json',
-				},
-				body: payload,
-				json: true,
-			});
-			returnData.push({ json: response.data ?? response });
-		} else if (operation === 'update') {
-			const recordId = this.getNodeParameter('id', 0) as string;
-			const attributes = parseJsonInput(this.getNodeParameter('data', 0));
-			const payload = {
-				data: { type: moduleName, id: recordId, attributes },
-			};
-			const response = await this.helpers.httpRequest({
-				method: 'PATCH',
-				url: `${apiUrl}/V8/module`,
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-					'Content-Type': 'application/json',
-				},
-				body: payload,
-				json: true,
-			});
-			returnData.push({ json: response.data ?? response });
-		} else if (operation === 'delete') {
-			const recordId = this.getNodeParameter('id', 0) as string;
-			await this.helpers.httpRequest({
-				method: 'DELETE',
-				url: `${apiUrl}/V8/module/${moduleName}/${recordId}`,
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
-				json: true,
-			});
-			returnData.push({ json: { success: true, id: recordId } });
-		} else if (operation === 'getRelationships') {
-			const recordId = this.getNodeParameter('id', 0) as string;
-			const relationship = this.getNodeParameter('relationship', 0) as string;
-			const response = await this.helpers.httpRequest({
-				method: 'GET',
-				url: `${apiUrl}/V8/module/${moduleName}/${recordId}/relationships/${relationship}`,
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
-				json: true,
-			});
-			returnData.push({ json: response.data ?? response });
 		}
 
 		return [returnData];

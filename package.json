@@ -1,26 +1,28 @@
 {
   "name": "n8n-nodes-suitecrm-community",
-  "version": "1.1.1",
-  "description": "A generic n8n node to operate with any SuiteCRM (SuiteCRM 7.x+) module via the official JSON API.",
+  "version": "2.2.0",
+  "description": "A generic n8n node to operate with any SuiteCRM (8.x+) module via the official JSON API.",
   "main": "dist/nodes/SuiteCRM/SuiteCRM.node.js",
+  "types": "dist/nodes/SuiteCRM/SuiteCRM.node.d.ts",
   "scripts": {
-    "build": "npx rimraf dist && tsc && cp nodes/SuiteCRM/suitecrm.png dist/nodes/SuiteCRM/"
+    "build": "rimraf dist && tsc && cp nodes/SuiteCRM/suitecrm.png dist/nodes/SuiteCRM/",
+    "lint": "eslint . --resolve-plugins-relative-to .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "n8n",
+    "sinergiacrm",
     "suitecrm",
-    "suitecrm",
-    "custom-node",
-    "n8n-community-node",
-    "n8n-community-nodes",
-    "n8n-custom-node",
-    "n8n-custom-nodes",
     "n8n-node",
     "n8n-nodes",
-    "n8n-node-package",
+    "n8n-custom-node",
+    "n8n-community-node",
     "n8n-community-node-package"
   ],
   "author": "Javier Quílez <javier.quilez@gmail.com>",
+  "organization": "Tecnología Solidaria",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -32,7 +34,8 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "nodes": [
-      "dist/nodes/SuiteCRM/SuiteCRM.node.js"
+      "dist/nodes/SuiteCRM/SuiteCRM.node.js",
+      "dist/nodes/SuiteCRM/SuiteCRMTrigger.node.js"
     ],
     "credentials": [
       "dist/credentials/SuiteCRMCredentials.credentials.js"
@@ -40,8 +43,15 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.13",
+    "@typescript-eslint/eslint-plugin": "^8.67.0",
+    "@typescript-eslint/parser": "^8.67.0",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "8.57.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.3",
+    "n8n-workflow": "1.82.0",
     "rimraf": "^5.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
     "n8n-workflow": "*"

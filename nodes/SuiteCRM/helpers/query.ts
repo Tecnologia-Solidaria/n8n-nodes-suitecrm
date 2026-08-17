@@ -1,55 +1,49 @@
+// helpers/query.ts
+import type { IDataObject } from 'n8n-workflow';
+import { buildFilters, type FilterOptions } from './filters';
+
 /**
- * Builds query parameters for SuiteCRM API v8.
- * Handles filters and pagination, supporting both standard and custom fields,
- * and only allows API-supported filter operators.
- *
- * @param options    Query options from node parameters (pageSize, pageNumber, filters)
- * @param pageNumber Page number to request (starts at 1)
- * @returns          Query string object to be spread into the httpRequest call
+ * Resolves the page size for a record listing request.
+ * With `returnAll`, uses the configured page size (20 by default) to walk
+ * the pagination; otherwise the limit is the size of the single page.
  */
-export function buildQueryParams(
-	options: {
-		pageSize?: number;
-		pageNumber?: number;
-		filters?: {
-			Filter?: Array<{
-				field: string;
-				customField?: string;
-				operator?: string;
-				value: string;
-			}>;
-		};
-	},
-	pageNumber: number,
-): Record<string, any> {
-	const qs: Record<string, any> = {};
-	qs['page[size]'] = options.pageSize || 20;
-	qs['page[number]'] = pageNumber;
+export function resolvePageSize(
+	returnAll: boolean,
+	limit: number,
+	options?: { pageSize?: number },
+): number {
+	return returnAll ? (options?.pageSize || 20) : limit;
+}
 
-	// List of operators supported by SuiteCRM v8 API
-	const SUPPORTED_OPERATORS: Record<string, string> = {
-		eq: 'EQ',
-		neq: 'NEQ',
-		gt: 'GT',
-		gte: 'GTE',
-		lt: 'LT',
-		lte: 'LTE',
+/**
+ * Builds the query parameters for a record listing request
+ * (pagination plus filters).
+ */
+export function buildListQuery(params: {
+	pageSize: number;
+	pageNumber: number;
+	filters?: FilterOptions;
+}): IDataObject {
+	return {
+		'page[size]': params.pageSize,
+		'page[number]': params.pageNumber,
+		...buildFilters(params.filters),
 	};
+}
 
-	if (options.filters && Array.isArray(options.filters.Filter)) {
-		for (const f of options.filters.Filter) {
-			let fieldName = f.field;
-			// If user chose "Custom..." field, use the custom field name
-			if (fieldName === '__custom__' && f.customField && f.customField.trim()) {
-				fieldName = f.customField.trim();
-			}
-			const opKey = (f.operator || 'eq').toLowerCase();
-			const opApi = SUPPORTED_OPERATORS[opKey];
-			if (!opApi) continue; // Skip unsupported operators
-			if (fieldName && f.value) {
-				qs[`filter[${fieldName}][${opApi}]`] = f.value;
-			}
-		}
-	}
-	return qs;
+/**
+ * Decides whether a listing request needs to fetch another page.
+ */
+export function shouldFetchNextPage(params: {
+	returnAll: boolean;
+	recordsLength: number;
+	pageSize: number;
+	limit: number;
+	collectedLength: number;
+}): boolean {
+	return (
+		params.returnAll &&
+		params.recordsLength >= params.pageSize &&
+		params.collectedLength < params.limit
+	);
 }

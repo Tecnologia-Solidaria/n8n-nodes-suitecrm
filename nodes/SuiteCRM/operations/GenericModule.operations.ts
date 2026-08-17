@@ -29,29 +29,24 @@ export const genericModuleOperations: INodeProperties[] = [
 		default: 'getAll',
 		options: [
 			{
-				name: 'Get All',
-				value: 'getAll',
-				action: 'Get all records',
-			},
-			{
-				name: 'Get One',
-				value: 'getOne',
-				action: 'Get a single record',
-			},
-			{
 				name: 'Create',
 				value: 'create',
 				action: 'Create a new record',
 			},
 			{
-				name: 'Update',
-				value: 'update',
-				action: 'Update a record',
-			},
-			{
 				name: 'Delete',
 				value: 'delete',
 				action: 'Delete a record',
+			},
+			{
+				name: 'Get Many',
+				value: 'getAll',
+				action: 'Get many records',
+			},
+			{
+				name: 'Get One',
+				value: 'getOne',
+				action: 'Get a single record',
 			},
 			{
 				name: 'Get Relationships',
@@ -67,6 +62,11 @@ export const genericModuleOperations: INodeProperties[] = [
 				name: 'Unlink Record',
 				value: 'unlinkRecord',
 				action: 'Unlink a record',
+			},
+			{
+				name: 'Update',
+				value: 'update',
+				action: 'Update a record',
 			},
 		],
 	},
@@ -112,44 +112,45 @@ export const genericModuleOperations: INodeProperties[] = [
 						name: 'Filter',
 						displayName: 'Filter',
 						values: [
-							{
-								displayName: 'Field',
-								name: 'field',
-								type: 'options',
-								typeOptions: {
-									loadOptionsMethod: 'getModuleFields',
-									loadOptionsDependsOn: ['module'],
+						{
+							displayName: 'Field Name or ID',
+							name: 'field',
+							type: 'options',
+							typeOptions: {
+								loadOptionsMethod: 'getModuleFields',
+								loadOptionsDependsOn: ['module'],
+							},
+							default: '',
+							placeholder: 'Select field or Custom...',
+							description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+						},
+						{
+							displayName: 'Custom Field Name',
+							name: 'customField',
+							type: 'string',
+							default: '',
+							placeholder: 'Field name (example: my_field_c)',
+							description: 'Only required if "Custom..." is selected above. Example: my_field_c.',
+							displayOptions: {
+								show: {
+									field: ['__custom__'],
 								},
-								default: '',
-								placeholder: 'Select field or Custom...',
 							},
-							{
-								displayName: 'Custom Field Name',
-								name: 'customField',
-								type: 'string',
-								default: '',
-								placeholder: 'Field name (example: my_field_c)',
-								description: 'Only required if "Custom..." is selected above. Example: my_field_c',
-								displayOptions: {
-									show: {
-										field: ['__custom__'],
-									},
-								},
-							},
-							{
-								displayName: 'Operator',
-								name: 'operator',
-								type: 'options',
-								default: 'eq',
-								options: [
-									{ name: 'Equals', value: 'eq', description: 'Equals (=)' },
-									{ name: 'Not Equals', value: 'neq', description: 'Not equals (≠)' },
-									{ name: 'Greater Than', value: 'gt', description: 'Greater than (>)' },
-									{ name: 'Greater Than or Equal', value: 'gte', description: 'Greater than or equal (≥)' },
-									{ name: 'Less Than', value: 'lt', description: 'Less than (<)' },
-									{ name: 'Less Than or Equal', value: 'lte', description: 'Less than or equal (≤)' },
-								],
-							},
+						},
+						{
+							displayName: 'Operator',
+							name: 'operator',
+							type: 'options',
+							default: 'eq',
+							options: [
+								{ name: 'Equals', value: 'eq', description: 'Equals (=)' },
+								{ name: 'Greater Than', value: 'gt', description: 'Greater than (>)' },
+								{ name: 'Greater Than or Equal', value: 'gte', description: 'Greater than or equal (≥)' },
+								{ name: 'Less Than', value: 'lt', description: 'Less than (<)' },
+								{ name: 'Less Than or Equal', value: 'lte', description: 'Less than or equal (≤)' },
+								{ name: 'Not Equals', value: 'neq', description: 'Not equals (≠)' },
+							],
+						},
 							{
 								displayName: 'Value',
 								name: 'value',
@@ -182,12 +183,12 @@ export const genericModuleOperations: INodeProperties[] = [
 
 	// Relationship field: shows for getRelationships, linkRecord and unlinkRecord operations
 	{
-		displayName: 'Relationship',
+		displayName: 'Relationship Name or ID',
 		name: 'relationship',
 		type: 'options',
 		default: '',
 		required: true,
-		description: 'Type of relationship to get, link or unlink',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: {
 			loadOptionsMethod: 'getAvailableRelationships',
 			loadOptionsDependsOn: ['module', 'id', 'recordId'],
@@ -216,12 +217,12 @@ export const genericModuleOperations: INodeProperties[] = [
 
 	// Destination module of the link
 	{
-		displayName: 'Related Module',
+		displayName: 'Related Module Name or ID',
 		name: 'relatedModule',
 		type: 'options',
 		default: '',
 		required: true,
-		description: 'Module of the related record',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: {
 			loadOptionsMethod: 'getModules',
 		},
@@ -297,7 +298,7 @@ export const genericModuleOperations: INodeProperties[] = [
 				displayName: 'Field',
 				values: [
 					{
-						displayName: 'Field',
+						displayName: 'Field Name or ID',
 						name: 'field',
 						type: 'options',
 						typeOptions: {
@@ -306,7 +307,7 @@ export const genericModuleOperations: INodeProperties[] = [
 						},
 						default: '',
 						placeholder: 'Select field or Custom...',
-						description: 'Field to set on the record',
+						description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 					},
 					{
 						displayName: 'Custom Field Name',
@@ -314,7 +315,7 @@ export const genericModuleOperations: INodeProperties[] = [
 						type: 'string',
 						default: '',
 						placeholder: 'Field name (example: my_field_c)',
-						description: 'Only required if "Custom..." is selected above. Example: my_field_c',
+						description: 'Only required if "Custom..." is selected above. Example: my_field_c.',
 						displayOptions: {
 							show: {
 								field: ['__custom__'],
@@ -379,14 +380,14 @@ export function resolveRecordAttributes(this: IExecuteFunctions, itemIndex: numb
 	}
 
 	const rawData = this.getNodeParameter('data', itemIndex, '{}');
-	try {
-		return parseJsonInput(rawData);
-	} catch (error) {
+	const parsed = parseJsonInput(rawData);
+	if (parsed === undefined) {
 		throw new NodeOperationError(
 			this.getNode(),
-			error instanceof Error ? error.message : String(error),
+			'SuiteCRM: The "Data" field must be a valid JSON string or object.',
 		);
 	}
+	return parsed;
 }
 
 /**
@@ -496,7 +497,7 @@ export async function linkRecord(
 				`The related record "${relatedId}" does not exist.`,
 			);
 		}
-		throw error;
+		throw new NodeOperationError(this.getNode(), error as any);
 	}
 }
 
@@ -524,7 +525,7 @@ export async function unlinkRecord(
 		if (getErrorStatus(error) === 404) {
 			return { success: true, alreadyUnlinked: true, id: relatedId };
 		}
-		throw error;
+		throw new NodeOperationError(this.getNode(), error as any);
 	}
 
 	return { success: true, id: relatedId };

@@ -13,7 +13,7 @@ export class SuiteCRMTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SuiteCRM Trigger',
 		name: 'suitecrmTrigger',
-		icon: 'file:suitecrm.svg',
+		icon: { light: 'file:suitecrm.svg', dark: 'file:suitecrm.svg' },
 		subtitle: '={{ $json.module }} - {{ $json.event }}',
 		group: ['trigger'],
 		version: 1,
@@ -32,12 +32,12 @@ export class SuiteCRMTrigger implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Modules',
-				name: 'module',
-				type: 'multiOptions',
-				default: [],
-				required: true,
-				description: 'Modules to watch for changes',
+			displayName: 'Module Names or IDs',
+			name: 'module',
+			type: 'multiOptions',
+			default: [],
+			required: true,
+			description: 'Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 				typeOptions: {
 					loadOptionsMethod: 'getModules',
 				},

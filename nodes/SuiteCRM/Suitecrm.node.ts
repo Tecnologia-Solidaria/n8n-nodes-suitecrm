@@ -4,7 +4,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
+import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 import type { IDataObject, NodeApiError } from 'n8n-workflow';
 import type { FilterOptions } from './helpers/filters';
 import { simplifyRecord } from './helpers/simplify';
@@ -33,7 +33,7 @@ export class SuiteCRM implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SuiteCRM',
 		name: 'suitecrm',
-		icon: 'file:suitecrm.svg',
+		icon: { light: 'file:suitecrm.svg', dark: 'file:suitecrm.svg' },
 		subtitle: '={{ $json.operation }}: {{ $json.module }}',
 		group: ['transform'],
 		version: 1,
@@ -52,12 +52,12 @@ export class SuiteCRM implements INodeType {
 		],
 		properties: [
 			{
-				displayName: 'Module',
-				name: 'module',
-				type: 'options',
-				required: true,
-				default: '',
-				description: 'Select a module from SuiteCRM',
+			displayName: 'Module Name or ID',
+			name: 'module',
+			type: 'options',
+			required: true,
+			default: '',
+			description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 				typeOptions: {
 					loadOptionsMethod: 'getModules',
 				},
@@ -69,26 +69,30 @@ export class SuiteCRM implements INodeType {
 				name: 'returnAll',
 				type: 'boolean',
 				default: false,
-				description: 'Fetch all records using auto-pagination',
+				description: 'Whether to return all results or only up to a given limit',
 				displayOptions: {
 					show: {
 						operation: ['getAll'],
 					},
 				},
 			},
-			{
-				displayName: 'Limit',
-				name: 'limit',
-				type: 'number',
-				default: '={{ $fromAI("limit", "Maximum number of records to return", "number", 100) }}',
-				description: 'Maximum number of records to return when Return All is disabled',
-				displayOptions: {
-					show: {
-						operation: ['getAll'],
-						returnAll: [false],
-					},
+		{
+			displayName: 'Limit',
+			name: 'limit',
+			type: 'number',
+			typeOptions: {
+				minValue: 1,
+				maxValue: 100,
+			},
+			default: 50,
+			description: 'Max number of results to return',
+			displayOptions: {
+				show: {
+					operation: ['getAll'],
+					returnAll: [false],
 				},
 			},
+		},
 			{
 				displayName: 'Simplify',
 				name: 'simplify',
@@ -232,7 +236,7 @@ export class SuiteCRM implements INodeType {
 					});
 					continue;
 				}
-				throw error;
+				throw new NodeOperationError(this.getNode(), error as any);
 			}
 		}
 

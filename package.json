@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-suitecrm-community",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "A generic n8n node to operate with any SuiteCRM (7.x+) module via the official JSON API.",
   "main": "dist/nodes/SuiteCRM/Suitecrm.node.js",
   "types": "dist/nodes/SuiteCRM/Suitecrm.node.d.ts",
@@ -21,7 +21,10 @@
     "n8n-community-node",
     "n8n-community-node-package"
   ],
-  "author": "Javier Quílez <javier.quilez@gmail.com> [Tecnología Solidaria]",
+  "author": {
+    "name": "Javier Quílez",
+    "email": "javier.quilez@gmail.com"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -30,6 +33,7 @@
   "bugs": {
     "url": "https://github.com/Tecnologia-Solidaria/n8n-nodes-suitecrm/issues"
   },
+  "homepage": "https://github.com/Tecnologia-Solidaria/n8n-nodes-suitecrm#readme",
   "n8n": {
     "n8nNodesApiVersion": 1,
     "nodes": [

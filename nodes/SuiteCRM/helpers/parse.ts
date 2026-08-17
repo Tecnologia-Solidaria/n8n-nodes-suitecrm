@@ -6,19 +6,18 @@ import type { IDataObject } from 'n8n-workflow';
  * Used for user-supplied input in operations like "create" or "update".
  *
  * @param input - Input value from the node parameter (string or object)
- * @returns Parsed object
- * @throws If the input is not a valid JSON object or string
+ * @returns Parsed object, or undefined if the input is not valid
  */
-export function parseJsonInput(input: unknown): IDataObject {
+export function parseJsonInput(input: unknown): IDataObject | undefined {
 	if (typeof input === 'string') {
 		try {
 			return JSON.parse(input);
 		} catch {
-			throw new Error('SuiteCRM: The "Data" field must be a valid JSON string or object.');
+			return undefined;
 		}
 	}
 	if (typeof input === 'object' && input !== null) {
 		return input as IDataObject;
 	}
-	throw new Error('SuiteCRM: The "Data" field must be a valid JSON object or string.');
+	return undefined;
 }

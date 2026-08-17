@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-suitecrm-community",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "description": "A generic n8n node to operate with any SuiteCRM (7.x+) module via the official JSON API.",
   "main": "dist/nodes/SuiteCRM/Suitecrm.node.js",
   "types": "dist/nodes/SuiteCRM/Suitecrm.node.d.ts",

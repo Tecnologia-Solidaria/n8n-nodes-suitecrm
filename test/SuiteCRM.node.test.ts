@@ -2,7 +2,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { NodeOperationError } from 'n8n-workflow';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
-import { SuiteCRM } from '../nodes/SuiteCRM/Suitecrm.node';
+import { Suitecrm } from '../nodes/SuiteCRM/Suitecrm.node';
 
 interface NodeContextOverrides {
 	items?: INodeExecutionData[];
@@ -45,7 +45,7 @@ function createExecuteContext(overrides: NodeContextOverrides = {}) {
 		},
 	} as unknown as IExecuteFunctions;
 
-	return { context, requestWithAuthentication, node: new SuiteCRM() };
+	return { context, requestWithAuthentication, node: new Suitecrm() };
 }
 
 describe('SuiteCRM.execute', () => {
@@ -659,12 +659,12 @@ describe('SuiteCRM.execute', () => {
 
 describe('SuiteCRM — herramienta de agentes (US5)', () => {
 	it('expone el nodo principal como usable como herramienta', () => {
-		const node = new SuiteCRM();
+		const node = new Suitecrm();
 		expect(node.description.usableAsTool).toBe(true);
 	});
 
 	it('ofrece una descripción de herramienta en inglés y no vacía', () => {
-		const node = new SuiteCRM();
+		const node = new Suitecrm();
 		expect(node.description.description.length).toBeGreaterThan(0);
 		expect(node.description.description).toMatch(/^[a-zA-Z0-9 ,.:()'/-]+$/);
 	});

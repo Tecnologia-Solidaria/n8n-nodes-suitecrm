@@ -9,7 +9,7 @@ import { poll as triggerPoll } from './operations/Trigger.operations';
  * n8n polling trigger for SuiteCRM (SuiteCRM API).
  * Emits one item per created or updated record in the selected modules.
  */
-export class SuiteCRMTrigger implements INodeType {
+export class SuitecrmTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SuiteCRM Trigger',
 		name: 'suitecrmTrigger',

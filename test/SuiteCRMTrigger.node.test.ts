@@ -1,10 +1,10 @@
-// test/SuiteCRMTrigger.node.test.ts
+// test/SuitecrmTrigger.node.test.ts
 import { describe, expect, it } from 'vitest';
-import { SuiteCRMTrigger } from '../nodes/SuiteCRM/SuitecrmTrigger.node';
+import { SuitecrmTrigger } from '../nodes/SuiteCRM/SuitecrmTrigger.node';
 
-describe('SuiteCRMTrigger', () => {
+describe('SuitecrmTrigger', () => {
 	it('expone un nodo de polling con la descripción correcta', () => {
-		const node = new SuiteCRMTrigger();
+		const node = new SuitecrmTrigger();
 
 		expect(node.description.name).toBe('suitecrmTrigger');
 		expect(node.description.displayName).toBe('SuiteCRM Trigger');
@@ -15,7 +15,7 @@ describe('SuiteCRMTrigger', () => {
 	});
 
 	it('define la credencial suitecrmOAuth2Api como obligatoria', () => {
-		const node = new SuiteCRMTrigger();
+		const node = new SuitecrmTrigger();
 
 		expect(node.description.credentials).toEqual([
 			{
@@ -26,7 +26,7 @@ describe('SuiteCRMTrigger', () => {
 	});
 
 	it('incluye los parámetros de módulos, eventos y cadencia', () => {
-		const node = new SuiteCRMTrigger();
+		const node = new SuitecrmTrigger();
 		const names = node.description.properties.map((property) => property.name);
 
 		expect(names).toEqual(
@@ -39,20 +39,20 @@ describe('SuiteCRMTrigger', () => {
 	});
 
 	it('mantiene eventos limitados a created y updated', () => {
-		const node = new SuiteCRMTrigger();
+		const node = new SuitecrmTrigger();
 		const events = node.description.properties.find((property) => property.name === 'events');
 
 		expect(events?.default).toEqual(['created', 'updated']);
 	});
 
 	it('delega el poll a las operaciones del trigger', async () => {
-		const node = new SuiteCRMTrigger();
+		const node = new SuitecrmTrigger();
 		expect(node.poll).toBeDefined();
 		expect(node.methods?.loadOptions).toBeDefined();
 	});
 
 	it('no es usable como herramienta (solo el nodo principal lo es)', () => {
-		const node = new SuiteCRMTrigger();
+		const node = new SuitecrmTrigger();
 		expect(node.description.usableAsTool).toBeUndefined();
 	});
 });

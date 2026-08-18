@@ -29,7 +29,7 @@ interface GetAllOptions {
  * n8n node for interacting with any module of SuiteCRM (SuiteCRM API).
  * Supports CRUD operations, relationship fetching, pagination and filters.
  */
-export class SuiteCRM implements INodeType {
+export class Suitecrm implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'SuiteCRM',
 		name: 'suitecrm',

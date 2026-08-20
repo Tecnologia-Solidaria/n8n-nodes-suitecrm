@@ -94,7 +94,7 @@ export class Suitecrm implements INodeType {
 			},
 		},
 			{
-				displayName: 'Simplify',
+				displayName: 'Simplify Response',
 				name: 'simplify',
 				type: 'boolean',
 				default: true,
